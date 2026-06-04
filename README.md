@@ -1,22 +1,17 @@
-# 📚 Study Session Tracker
+# 📚 Smart Study Tracker
 
-A simple command-line Study Session Tracker built using Python.
-
-This application allows users to record and manage study sessions for both college subjects and external skill learning. Users can add new sessions, track study duration, and organize their learning activities efficiently.
-
----
+A Python CLI application for tracking study sessions, managing subjects and skills, calculating study time, and generating learning summaries.
 
 ## 🚀 Features
 
-- 📖 Track college study sessions
-- 💻 Track external skill-learning sessions
 - ➕ Add new study sessions
+- 📖 Track college subjects
+- 💻 Track external skills
 - ⏱️ Record study time in minutes
-- 📋 Display all study sessions
-- ✅ Input validation for study duration
-- 🖥️ Simple CLI-based interface
-
----
+- 📊 View total study time
+- 📋 Generate study summaries
+- ❌ Delete sessions
+- 🖥️ Interactive menu system
 
 ## 🛠️ Technologies Used
 
@@ -24,15 +19,13 @@ This application allows users to record and manage study sessions for both colle
 - Lists
 - Dictionaries
 - Functions
+- Loops
 - Conditional Statements
-- User Input Handling
-
----
 
 ## 📂 Project Structure
 
 ```text
-study-session-tracker/
+smart-study-tracker/
 │
 ├── study_tracker.py
 └── README.md
