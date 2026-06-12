@@ -1,21 +1,22 @@
-sessions = []
-    
-session1 = {
-    "type": "college",
-    "subject": "Maths",
-    "time": 60
-}
+import json
 
-session2 = {
-    "type": "skill",
-    "subject": "Python",
-    "time": 60
-}
+sessions =[]
 
-sessions.append(session1)
-sessions.append(session2)
+def save_data():
+    with open("sessions.json", "w") as file:
+        json.dump(sessions, file, indent=4)
 
+#------------------------------------------------------------------------------------------------------------------------
 
+def load_data():
+    global sessions
+    try:
+        with open("sessions.json", "r") as file:
+            sessions = json.load(file)
+    except (FileNotFoundError, json.JSONDecodeError):
+        sessions = []
+#------------------------------------------------------------------------------------------------------------------------
+      
 def calculate_time():
     total_time = 0
     college_time = {}
@@ -24,17 +25,40 @@ def calculate_time():
     for s in sessions:
         total_time += s["time"]
 
-        if s["type"] == "college":
+        if s["type"].lower() == "college":
             college_time[s["subject"]] = college_time.get(s["subject"], 0) + s["time"]
         else:
             skill_time[s["subject"]] = skill_time.get(s["subject"], 0) + s["time"]
 
     return total_time, college_time, skill_time
 
+#------------------------------------------------------------------------------------------------------------------------
+
+def most_studied():
+    if not sessions:
+        print("No data available!")
+        return
+
+    totals = {}
+
+    for s in sessions:
+        totals[s["subject"]] = totals.get(s["subject"], 0) + s["time"]
+
+    top = max(totals, key=totals.get)
+
+    print(f"\nMost Studied: {top} ({totals[top]} minutes)")
+
+#------------------------------------------------------------------------------------------------------------------------
+
 def show_summary():
+
+    if not sessions:
+        print("No study data available!")
+        return
+
     total, college, skills = calculate_time()
 
-    print("\n-----Total Study Time-----:\n", total)
+    print(f"\nTotal Study Time: {total} minutes")
 
     print("\n-----College Subjects-----:")
     for sub, t in college.items():
@@ -43,6 +67,8 @@ def show_summary():
     print("\n-----External Skills------:")
     for sub, t in skills.items():
         print(f"{sub}: {t}")
+
+#------------------------------------------------------------------------------------------------------------------------
 
 def add_session():
 
@@ -79,8 +105,11 @@ def add_session():
     }
 
     sessions.append(session)
+    save_data()
 
     print("Session added!")
+
+#------------------------------------------------------------------------------------------------------------------------
 
 def delete_session():
     if not sessions:
@@ -92,13 +121,18 @@ def delete_session():
         print(f"{idx}. {s['type']} - {s['subject']} ({s['time']} mins)")
     try:
         choice = int(input("Enter session number to delete: "))
+
         if choice > 0 and choice <= len(sessions):
             removed = sessions.pop(choice - 1)
             print(f"Removed: {removed['type']} - {removed['subject']} ({removed['time']} mins)")
+            save_data()
         else:
             print("Invalid session number!")
     except ValueError:
         print("Invalid input!")        
+
+#------------------------------------------------------------------------------------------------------------------------
+load_data()
 
 def menu():
     while True:
@@ -106,7 +140,8 @@ def menu():
         print("1. Add Session")
         print("2. Show Summary")
         print("3. Delete Session")
-        print("4. Exit")
+        print("4. Most Studied")
+        print("5. Exit")
 
         choice = input("Enter choice: ")
 
@@ -117,7 +152,8 @@ def menu():
         elif choice == "3":
             delete_session()
         elif choice == "4":
-            print("Goodbye!")
+            most_studied()
+        elif choice == "5":
             break
         else:
             print("Invalid choice!")
