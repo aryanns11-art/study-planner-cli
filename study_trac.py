@@ -45,7 +45,7 @@ def most_studied():
     for s in sessions:
         totals[s["subject"]] = totals.get(s["subject"], 0) + s["time"]
 
-    top = max(totals, key=totals.get)
+    top = max(totals, key=totals.get)  # Find the subject with the highest total study time
 
     print(f"\nMost Studied: {top} ({totals[top]} minutes)")
 
@@ -58,38 +58,61 @@ def show_summary():
 
     total, college, skills = calculate_time()
 
-    print("\n" + "="*40)
-    print("STUDY SUMMARY".center(40))
-    print("="*40)
+    total_hours = total // 60
+    total_minutes = total % 60
 
-    print(f"\nTotal Study Time: {total} minutes")
+    print("\n" + "=" * 40)
+    print("STUDY SUMMARY".center(40))
+    print("=" * 40)
+
+    print(f"\nTotal Study Time: {total_hours}h {total_minutes}m")
+    print(f"Total Sessions: {len(sessions)}")
 
     print("\nCollege Subjects:")
     if college:
         for sub, t in college.items():
-            print(f"  - {sub:<15} : {t} mins")
+            h = t // 60
+            m = t % 60
+            print(f"  - {sub:<15} : {h}h {m}m")
     else:
         print("  No data")
 
     print("\nExternal Skills:")
     if skills:
         for sub, t in skills.items():
-            print(f"  - {sub:<15} : {t} mins")
+            h = t // 60
+            m = t % 60
+            print(f"  - {sub:<15} : {h}h {m}m")
     else:
         print("  No data")
 
-    print("\n" + "-"*50)
-    print("All Sessions".center(50))
-    print("-"*50)
+    print("\n" + "-" * 60)
+    print("All Sessions".center(60))
+    print("-" * 60)
 
-    print(f"{'No.':<5}{'Subject':<15}{'Time':<10}{'Type':<10}{'Date'}")
+    print(f"{'No.':<5}{'Subject':<15}{'Time':<12}{'Type':<10}{'Date'}")
 
     sorted_sessions = sorted(sessions, key=lambda x: x.get("date", ""))
+
     for idx, s in enumerate(sorted_sessions, 1):
-        print(f"{idx:<5}{s['subject']:<15}{str(s['time'])+'m':<10}{s['type']:<10}{s.get('date','N/A')}")
 
-    print("="*50)
+        hours = s["time"] // 60
+        minutes = s["time"] % 60
 
+        if hours:
+            time_str = f"{hours}h {minutes}m"
+        else:
+            time_str = f"{minutes}m"
+
+        print(
+            f"{idx:<5}"
+            f"{s['subject']:<15}"
+            f"{time_str:<12}"
+            f"{s['type']:<10}"
+            f"{s.get('date', 'N/A')}"
+        )
+
+    print("=" * 60)
 #------------------------------------------------------------------------------------------------------------------------
 
 def add_session():
@@ -160,12 +183,22 @@ def edit_session():
 
             if new_time:
                 try:
-                    session["time"] = int(new_time)
+                    new_int_time = int(new_time)
+
+                    if new_int_time <= 0:
+                         print("Time must be positive!")
+                         return
+                    session["time"] = new_int_time
+                    
                 except ValueError:
                     print("Invalid time! Keeping old value.")
 
             if new_type:
-                session["type"] = new_type.lower()
+                if new_type.lower() in ["college", "skill"]:
+                    session["type"] = new_type.lower()
+                else:
+                    print("Invalid type!")
+                    return
 
             save_data()
 
