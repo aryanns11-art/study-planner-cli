@@ -2,16 +2,19 @@
   {
     "type": "college",
     "subject": "Maths",
-    "time": 60
+    "time": 60,
+    "date": "2026-06-13"
   },
   {
     "type": "skill",
     "subject": "Python",
-    "time": 60
+    "time": 60,
+    "date": "2026-06-13"
   },
   {
     "type": "skill",
     "subject": "MMA",
-    "time": 45
+    "time": 45,
+    "date": "2026-06-13"
   }
 ]

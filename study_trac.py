@@ -1,4 +1,5 @@
 import json
+from datetime import datetime
 
 sessions =[]
 
@@ -25,7 +26,7 @@ def calculate_time():
     for s in sessions:
         total_time += s["time"]
 
-        if s["type"].lower() == "college":
+        if s.get("type", "").lower() == "college":
             college_time[s["subject"]] = college_time.get(s["subject"], 0) + s["time"]
         else:
             skill_time[s["subject"]] = skill_time.get(s["subject"], 0) + s["time"]
@@ -49,24 +50,45 @@ def most_studied():
     print(f"\nMost Studied: {top} ({totals[top]} minutes)")
 
 #------------------------------------------------------------------------------------------------------------------------
-
 def show_summary():
 
     if not sessions:
-        print("No study data available!")
+        print("\nNo study data available!")
         return
 
     total, college, skills = calculate_time()
 
+    print("\n" + "="*40)
+    print("STUDY SUMMARY".center(40))
+    print("="*40)
+
     print(f"\nTotal Study Time: {total} minutes")
 
-    print("\n-----College Subjects-----:")
-    for sub, t in college.items():
-        print(f"{sub}: {t}")
+    print("\nCollege Subjects:")
+    if college:
+        for sub, t in college.items():
+            print(f"  - {sub:<15} : {t} mins")
+    else:
+        print("  No data")
 
-    print("\n-----External Skills------:")
-    for sub, t in skills.items():
-        print(f"{sub}: {t}")
+    print("\nExternal Skills:")
+    if skills:
+        for sub, t in skills.items():
+            print(f"  - {sub:<15} : {t} mins")
+    else:
+        print("  No data")
+
+    print("\n" + "-"*50)
+    print("All Sessions".center(50))
+    print("-"*50)
+
+    print(f"{'No.':<5}{'Subject':<15}{'Time':<10}{'Type':<10}{'Date'}")
+
+    sorted_sessions = sorted(sessions, key=lambda x: x.get("date", ""))
+    for idx, s in enumerate(sorted_sessions, 1):
+        print(f"{idx:<5}{s['subject']:<15}{str(s['time'])+'m':<10}{s['type']:<10}{s.get('date','N/A')}")
+
+    print("="*50)
 
 #------------------------------------------------------------------------------------------------------------------------
 
@@ -101,13 +123,59 @@ def add_session():
     session = {
         "type": session_type,
         "subject": subject,
-        "time": time
-    }
+        "time": time,
+        "date":datetime.now().strftime("%Y-%m-%d")
+        }
 
     sessions.append(session)
     save_data()
 
     print("Session added!")
+
+#------------------------------------------------------------------------------------------------------------------------
+
+def edit_session():
+    if not sessions:
+        print("No sessions to edit!")
+        return
+
+    print("\nEdit Study Session")
+    for idx, s in enumerate(sessions, 1):
+        print(f"{idx}. {s['type']} - {s['subject']} ({s['time']} mins) [{s.get('date','N/A')}]")
+
+    try:
+        choice = int(input("Enter session number to edit: "))
+
+        if 1 <= choice <= len(sessions):
+            session = sessions[choice - 1]
+
+            print("\nLeave blank to keep current value")
+
+            new_subject = input(f"Subject ({session['subject']}): ").strip()
+            new_time = input(f"Time ({session['time']}): ").strip()
+            new_type = input(f"Type ({session['type']}): ").strip()
+
+            if new_subject:
+                session["subject"] = new_subject.title()
+
+            if new_time:
+                try:
+                    session["time"] = int(new_time)
+                except ValueError:
+                    print("Invalid time! Keeping old value.")
+
+            if new_type:
+                session["type"] = new_type.lower()
+
+            save_data()
+
+            print("Session updated!")
+
+        else:
+            print("Invalid session number!")
+
+    except ValueError:
+        print("Invalid input!")
 
 #------------------------------------------------------------------------------------------------------------------------
 
@@ -118,7 +186,7 @@ def delete_session():
     
     print("\nDelete Study Session")
     for idx, s in enumerate(sessions, 1):
-        print(f"{idx}. {s['type']} - {s['subject']} ({s['time']} mins)")
+        print(f"{idx}. {s['type']} - {s['subject']} ({s['time']} mins) [{s.get('date','N/A')}]")
     try:
         choice = int(input("Enter session number to delete: "))
 
@@ -141,7 +209,8 @@ def menu():
         print("2. Show Summary")
         print("3. Delete Session")
         print("4. Most Studied")
-        print("5. Exit")
+        print("5. Edit Session")
+        print("6. Exit")
 
         choice = input("Enter choice: ")
 
@@ -154,7 +223,9 @@ def menu():
         elif choice == "4":
             most_studied()
         elif choice == "5":
-            break
+            edit_session()
+        elif choice == "6":
+            break    
         else:
             print("Invalid choice!")
 
